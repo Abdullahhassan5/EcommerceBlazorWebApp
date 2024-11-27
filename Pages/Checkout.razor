@@ -1,0 +1,40 @@
+﻿@page "/checkout"
+@using ECommerceWebApp.Services
+
+@inject CartService CartService
+@inject NavigationManager NavigationManager
+
+
+<div class="container mt-5">
+    <h2>Checkout</h2>
+    <form @onsubmit="HandleSubmit">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" id="name" class="form-control" @bind="Name" required />
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" class="form-control" @bind="Email" required />
+        </div>
+        <div class="mb-3">
+            <label for="address" class="form-label">Address</label>
+            <textarea id="address" class="form-control" @bind="Address" required></textarea>
+        </div>
+        <h4>Total: $@CartService.GetTotalPrice().ToString("F2")</h4>
+        <button type="submit" class="btn btn-success">Place Order</button>
+    </form>
+</div>
+
+@code {
+    private string Name { get; set; }
+    private string Email { get; set; }
+    private string Address { get; set; }
+
+    private void HandleSubmit()
+    {
+        // Logic to process the order
+        CartService.ClearCart(); // Clear the cart after checkout
+        NavigationManager.NavigateTo("/thankyou");
+    }
+
+}

@@ -1,0 +1,52 @@
+﻿@page "/login"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<h3>Admin Login</h3>
+<div>
+    <label>Username:</label>
+    <input type="text" @bind="username" placeholder="Enter username" class="form-control" />
+</div>
+<div>
+    <label>Password:</label>
+    <input type="password" @bind="password" placeholder="Enter password" class="form-control" />
+</div>
+<button class="btn btn-primary mt-2" @onclick="PerformLogin">Login</button>
+<p class="text-danger mt-2">@errorMessage</p>
+
+@code {
+    private string username = string.Empty;
+    private string password = string.Empty;
+    private string errorMessage = string.Empty;
+
+    private async Task PerformLogin()
+    {
+        // Basic form validation for empty fields
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+        {
+            errorMessage = "Username and password are required.";
+            return;
+        }
+
+        var loginInfo = new { Username = username, Password = password };
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("https://localhost:7102/api/Auth/login", loginInfo);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Redirect to admin panel on successful login
+                Navigation.NavigateTo("/admin");
+            }
+            else
+            {
+                errorMessage = "Invalid credentials. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred: {ex.Message}";
+        }
+    }
+}

@@ -1,0 +1,17 @@
+﻿@page "/thankyou"
+
+<div class="container mt-5 text-center">
+    <h2>Thank You for Your Order!</h2>
+    <p>We have received your order and are processing it. You will receive a confirmation email shortly.</p>
+    <button class="btn btn-primary mt-3" @onclick="NavigateToHome">Return to Home</button>
+</div>
+
+@code {
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+    private void NavigateToHome()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

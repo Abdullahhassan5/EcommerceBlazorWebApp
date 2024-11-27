@@ -1,0 +1,55 @@
+﻿@page "/products"
+@using ECommerceWebApp.Models
+@using ECommerceWebApp.Services
+@inject ProductService ProductService
+@inject CartService CartService
+
+<div class="container mt-5">
+    <h2>Our Products</h2>
+    <div class="product-row">
+        @if (products == null || !products.Any())
+        {
+            <p>Loading products...</p>
+        }
+        else
+        {
+            @foreach (var product in products)
+            {
+                <div class="product-card">
+                    <div class="card">
+                        <img class="card-img-top" src="@product.ImageUrl" alt="@product.Name">
+                    </div>
+                    <div class="product-info">
+                        <h5>@product.Name</h5>
+                        <p>@product.Description</p>
+                        <p class="price"><strong>Price: $@product.Price</strong></p>
+                        <button class="btn btn-primary" @onclick="() => AddToCart(product)">Add to Cart</button>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    private List<Product> products = new(); // List of products
+
+    // Fetch products from the backend API when the page initializes
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            products = await ProductService.GetProductsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching products: {ex.Message}");
+        }
+    }
+
+    // Method to add a product to the cart
+    private void AddToCart(Product product)
+    {
+        CartService.AddToCart(product); // Use CartService to handle cart operations
+    }
+}

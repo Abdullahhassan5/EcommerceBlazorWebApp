@@ -1,0 +1,75 @@
+﻿@inject HttpClient Http
+@using ECommerceWebApp.Models
+
+@if (IsVisible)
+{
+    <div class="form-container">
+        <h5 class="form-title">@ModalTitle</h5>
+        <form>
+            <div class="mb-3">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" @bind="Product.Name" placeholder="Enter product name" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" @bind="Product.Description" rows="3" placeholder="Enter product description"></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Price</label>
+                <input type="number" class="form-control" @bind="Product.Price" min="0" step="0.01" placeholder="Enter price" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Image URL</label>
+                <input type="text" class="form-control" @bind="Product.ImageUrl" placeholder="Enter image URL" />
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" @onclick="SaveProduct">Save</button>
+                <button type="button" class="btn btn-secondary" @onclick="CloseModal">Cancel</button>
+            </div>
+        </form>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Product Product { get; set; } = new Product();
+
+    [Parameter]
+    public EventCallback OnSave { get; set; }
+
+    [Parameter]
+    public string ModalTitle { get; set; } = "Add Product";
+
+    public bool IsVisible { get; set; }
+
+    public void ShowModal(Product product, string title)
+    {
+        Product = product;
+        ModalTitle = title;
+        IsVisible = true;
+        StateHasChanged(); // Update the UI to show the modal
+    }
+
+    private async Task SaveProduct()
+    {
+        if (Product.Id == 0)
+        {
+            // Add new product
+            await Http.PostAsJsonAsync("https://localhost:7102/api/Products", Product);
+        }
+        else
+        {
+            // Update existing product
+            await Http.PutAsJsonAsync($"https://localhost:7102/api/Products/{Product.Id}", Product);
+        }
+
+        IsVisible = false; // Hide the modal
+        await OnSave.InvokeAsync();
+    }
+
+    private void CloseModal()
+    {
+        IsVisible = false; // Hide the modal
+        StateHasChanged(); // Update the UI
+    }
+}

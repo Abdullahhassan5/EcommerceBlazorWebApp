@@ -1,0 +1,65 @@
+﻿@page "/cart"
+@using ECommerceWebApp.Services
+@using ECommerceWebApp.Models
+@inject CartService CartService
+@inject NavigationManager NavigationManager 
+<div class="container mt-5">
+    <h2>Your Shopping Cart</h2>
+    @if (CartItems.Count == 0)
+    {
+        <p>Your cart is empty!</p>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in CartItems)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>$@item.Price</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" @onclick="() => RemoveFromCart(item)">Remove</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <h4>Total: $@CartService.GetTotalPrice().ToString("F2")</h4>
+        <!-- Proceed to Checkout Button -->
+        <div class="text-right mt-3">
+            <button class="btn btn-success" @onclick="NavigateToCheckout">Proceed to Checkout</button>
+        </div>
+    }
+</div>
+
+@code {
+    private List<Product> CartItems = new();
+    private double TotalPrice;
+
+    protected override void OnInitialized()
+    {
+        // Use .ToList() to convert IEnumerable to List
+        CartItems = CartService.GetCartItems().ToList();
+        TotalPrice = CartService.GetTotalPrice();
+    }
+
+    private void RemoveFromCart(Product product)
+    {
+        CartService.RemoveFromCart(product);
+        CartItems = CartService.GetCartItems().ToList(); // Convert to List
+        TotalPrice = CartService.GetTotalPrice();
+    }
+
+    private void NavigateToCheckout()
+    {
+        NavigationManager.NavigateTo("/checkout"); // Properly reference NavigationManager
+    }
+}

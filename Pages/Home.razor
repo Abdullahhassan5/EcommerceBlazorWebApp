@@ -1,0 +1,57 @@
+﻿@page "/"
+
+@using ECommerceWebApp.Services
+@using ECommerceWebApp.Models
+@inject ProductService ProductService
+
+<!-- Hero Section -->
+<div class="hero-section" style="background: linear-gradient(to right, #1d3557, #457b9d); color: white; padding: 50px; text-align: center; border-radius: 10px;">
+    <h1>Welcome to ECommerceWebApp!</h1>
+    <p>Your one-stop shop for amazing products at unbeatable prices.</p>
+    <button class="btn btn-primary btn-lg" style="margin-top: 20px;" @onclick="NavigateToProducts">Shop Now</button>
+</div>
+
+<!-- Featured Products Section -->
+<div class="container mt-5">
+    <h2>Featured Products</h2>
+    <div class="product-row">
+        @foreach (var product in featuredProducts)
+        {
+            <div class="product-card">
+                <div class="card">
+                    <img class="card-img-top" src="Images/file.jpg" alt="@product.Name">
+                </div>
+                <div class="product-info">
+                    <h5>@product.Name</h5>
+                    <p>@product.Description</p>
+                    <p class="price"><strong>Price: $@product.Price</strong></p>
+                    <button class="btn btn-primary">View Details</button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Call-to-Action Section -->
+<div class="cta-section text-center mt-5">
+    <h3>Don't miss out on our latest deals!</h3>
+    <button class="btn btn-success btn-lg mt-3" @onclick="NavigateToProducts">Browse Products</button>
+</div>
+
+@code {
+    private List<Product> featuredProducts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var allProducts = await ProductService.GetProductsAsync();
+        featuredProducts = allProducts.Take(2).ToList(); // Select the first two products as featured products
+    }
+
+    private void NavigateToProducts()
+    {
+        NavigationManager.NavigateTo("/products");
+    }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+}
